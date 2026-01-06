@@ -12,10 +12,7 @@ class CellType(Enum):
 
 
 class Cell:
-    def __init__(self, x, y, cell_id, cell_type=CellType.NORMAL, occupied_by=None):
-        self.x = x
-        self.y = y
-        self.coordinates = (x, y)
+    def __init__(self, cell_id, cell_type=CellType.NORMAL, occupied_by=None):
         self.id = cell_id
         self.type = cell_type
         self.occupied_by = occupied_by

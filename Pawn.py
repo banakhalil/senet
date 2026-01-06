@@ -6,3 +6,5 @@ class Pawn:
 
     def exit_board(self):
         self.cell_id = None
+
+    
