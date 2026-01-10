@@ -1,5 +1,18 @@
 import random
 
+# هاد التابعرح تستخدمو خوارزمية الذكاء وقت بدا تحسب احتمالات الرمية 
+# يستخدم في عقدة الحظ 
+def stick_throw_probabilities():
+    probabilities = {
+            1: 4/16,
+            2: 6/16,
+            3: 4/16,
+            4: 1/16,
+            5: 1/16   
+        }
+    return probabilities
+
+
 class ThrowingSticks:
     def __init__(self):
         self.sticks_count = 4
@@ -22,7 +35,3 @@ class ThrowingSticks:
             return dark_faces
 
     
-# steps_num هاي القيمة يلي رح ناخدها بتوابع الحركة 
-steps_num = ThrowingSticks().throw_sticks()
-
-print("number of steps", steps_num)
