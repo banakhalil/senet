@@ -9,6 +9,48 @@ class  Expectiminimax:
         self.ai_color = ai_color
         self.opponent_color = "BLACK" if ai_color == "WHITE" else "WHITE"
 
+
+    # def evaluate_heuristic(self, state):
+    #     score = 0
+    #     board = state.board
+
+    #     if board.is_game_over():
+    #         winner = board.get_winner()
+    #         if winner == self.ai_color: return 10000
+    #         else: return -10000
+    #     score += (board.exited_pawns[self.ai_color] * 200)
+    #     score -= (board.exited_pawns[self.opponent_color] * 200)
+ 
+    #     for pawn in board.get_pawns_of_player(self.ai_color):
+    #         if pawn.cell_id is not None:
+    #             score += pawn.cell_id
+    #             if pawn.cell_id in [26, 30]: score += 150
+    #             elif pawn.cell_id == 27: score -= 100
+    #             elif pawn.cell_id == 28:
+    #                 score += (100 - (12/16) * (28 - 15))
+    #             elif pawn.cell_id == 29:
+    #                 score += (100 - (10/16) * (29 - 15))
+    #     for pawn in board.get_pawns_of_player(self.opponent_color):
+    #         if pawn.cell_id is not None:
+    #             score -= pawn.cell_id
+    #             if pawn.cell_id in [26, 30]: score -= 150
+    #             elif pawn.cell_id == 27: score += 100
+    #             elif pawn.cell_id == 28:
+    #                 score -= (100 - (12/16) * (28 - 15))
+    #             elif pawn.cell_id == 29:
+    #                 score -= (100 - (10/16) * (29 - 15))
+
+    #     if board.current_player == self.opponent_color:
+    #        dice_to_check = board.current_dice if board.current_dice else 1
+    #        movable_pawns = board.get_movable_pawns(dice_to_check)
+        
+    #        if not movable_pawns:
+    #           score += 100 
+
+
+    #     return score
+
+
     def evaluate_heuristic(self, state):
         score = 0
         board = state.board
@@ -24,23 +66,38 @@ class  Expectiminimax:
         for pawn in board.get_pawns_of_player(self.ai_color):
             if pawn.cell_id is not None:
                 score += pawn.cell_id
-                if pawn.cell_id in [26, 30]: score += 150
-                elif pawn.cell_id == 27: score -= 100
+                
+                if pawn.cell_id in [26, 30]: 
+                    score += 150 
+                elif pawn.cell_id == 27: 
+                    score -= 100 
                 elif pawn.cell_id == 28:
-                    score += (100 - (12/16) * (28 - 15))
+                    score += 48.75 
                 elif pawn.cell_id == 29:
-                    score += (100 - (10/16) * (29 - 15))
+                    score += 65.625
 
         for pawn in board.get_pawns_of_player(self.opponent_color):
             if pawn.cell_id is not None:
                 score -= pawn.cell_id
-                if pawn.cell_id in [26, 30]: score -= 150
-                elif pawn.cell_id == 27: score += 100
+                
+                if pawn.cell_id in [26, 30]: 
+                    score -= 150
+                elif pawn.cell_id == 27: 
+                    score += 100
                 elif pawn.cell_id == 28:
-                    score -= (100 - (12/16) * (28 - 15))
+                    score -= 48.75
                 elif pawn.cell_id == 29:
-                    score -= (100 - (10/16) * (29 - 15))
+                    score -= 65.625
+
+        if board.current_player == self.opponent_color:
+            dice_to_check = board.current_dice if board.current_dice else 1
+            movable_pawns = board.get_movable_pawns(dice_to_check)
+            
+            if not movable_pawns:
+                score += 100 
+
         return score
+
 
     def expectiminimax(self, state, depth, is_chance_node, current_dice=None):
         if depth == 0 or state.board.is_game_over():
