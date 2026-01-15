@@ -1,4 +1,7 @@
 # التوابع هون لتناوب اللعب بين المستخدم والكمبيوتر
+from Expectiminimax import Expectiminimax
+from GameState import GameState
+
 class GameController:
     def __init__(self, board):
         self.board = board
@@ -43,5 +46,6 @@ class GameController:
             if best_pawn_id is None:
                 best_pawn_id = movable[0]
 
-                print(f"AI selected pawn ID: {best_pawn_id} based on evaluation: {score}")            self.board.handle_movement(best_pawn_id, steps)
+            print(f"AI selected pawn ID: {best_pawn_id} based on evaluation: {score}")
+            self.board.handle_movement(best_pawn_id, steps)
             self.board.print_board()
