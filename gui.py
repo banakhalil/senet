@@ -207,20 +207,77 @@ class SenetGUI:
         else:
             messagebox.showwarning("تنبيه", "اختر حجراً يخصك!")
 
+    # def ai_move(self):
+    #     """منطق اتخاذ القرار للذكاء الاصطناعي"""
+    #     steps = self.board_logic.current_dice
+    #     state = GameState(self.board_logic, self.board_logic.current_player)
+        
+    #     # استدعاء خوارزمية البحث
+    #     _, best_pawn_id = self.ai_engine.expectiminimax(state, self.ai_engine.max_depth, False, steps)
+        
+    #     # اختيار حركة بديلة إذا فشلت الخوارزمية في العثور على مسار (احتياط)
+    #     if best_pawn_id is None:
+    #         movable = self.board_logic.get_movable_pawns(steps)
+    #         best_pawn_id = movable[0]
+
+    #     self.board_logic.handle_movement(best_pawn_id, steps)
+    #     self.post_move_actions()
     def ai_move(self):
-        """منطق اتخاذ القرار للذكاء الاصطناعي"""
+        """
+        منطق اتخاذ القرار للذكاء الاصطناعي (Expectiminimax) 
+        مع تفعيل الطلب السادس: تتبع العقد المزارة، قيم التقييم، وتوليد تقرير في ملف نصي.
+        """
+        # الحصول على قيمة الرمية الحالية وحالة اللعبة
         steps = self.board_logic.current_dice
         state = GameState(self.board_logic, self.board_logic.current_player)
         
-        # استدعاء خوارزمية البحث
-        _, best_pawn_id = self.ai_engine.expectiminimax(state, self.ai_engine.max_depth, False, steps)
+        # --- الطلب السادس: إعداد ملف التتبع ---
+        # 1. مسح محتوى الملف القديم لتبدأ حركة جديدة نظيفة
+        try:
+            with open(self.ai_engine.log_file, "w", encoding="utf-8") as f:
+                f.write(f"--- AI Decision Logic | Current Player: {self.board_logic.current_player} ---\n")
+                f.write(f"--- Dice Roll Result: {steps} ---\n\n")
+        except Exception as e:
+            print(f"Error opening log file: {e}")
         
-        # اختيار حركة بديلة إذا فشلت الخوارزمية في العثور على مسار (احتياط)
+        # 2. تصفير عداد العقد في محرك الذكاء الاصطناعي قبل بدء عملية البحث 
+        self.ai_engine.nodes_count = 0
+        # ---------------------------------------
+
+        # استدعاء خوارزمية Expectiminimax للحصول على أفضل قيمة وأفضل حجر للتحريك
+        # يتم تمرير indent فارغ ("") لبدء رسم الشجرة بشكل هرمي في الملف [cite: 65]
+        score, best_pawn_id = self.ai_engine.expectiminimax(
+            state, 
+            self.ai_engine.max_depth, 
+            False, 
+            steps, 
+            ""
+        )
+        
+        # إجراء احتياطي: إذا لم تعد الخوارزمية بحجر (لحالة نادرة)، نختار أول حجر متاح
         if best_pawn_id is None:
             movable = self.board_logic.get_movable_pawns(steps)
-            best_pawn_id = movable[0]
+            if movable:
+                best_pawn_id = movable[0]
 
-        self.board_logic.handle_movement(best_pawn_id, steps)
+        # --- الطلب السادس: طباعة ملخص النتائج في نهاية الملف ---
+        try:
+            with open(self.ai_engine.log_file, "a", encoding="utf-8") as f:
+                f.write("\n" + "="*40 + "\n")
+                f.write(f"FINAL DECISION SUMMARY:\n")
+                f.write(f"Total Nodes Explored (Search Space): {self.ai_engine.nodes_count}\n")
+                f.write(f"Heuristic Value for Chosen Move: {score}\n")
+                f.write(f"Action Taken: Moved Pawn ID {best_pawn_id}\n")
+                f.write("="*40 + "\n")
+        except Exception as e:
+            print(f"Error writing summary to log: {e}")
+        # ------------------------------------------------------
+
+        # تنفيذ الحركة الفعلية على اللوحة إذا تم العثور على حجر قابل للتحريك
+        if best_pawn_id is not None:
+            self.board_logic.handle_movement(best_pawn_id, steps)
+        
+        # تحديث الواجهة والتحقق من انتهاء اللعبة أو تبديل الدور [cite: 64]
         self.post_move_actions()
 
     def post_move_actions(self):

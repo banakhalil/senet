@@ -1,0 +1,24 @@
+--- AI Decision Logic | Current Player: WHITE ---
+--- Dice Roll Result: 2 ---
+
+Node: MAX, Depth: 2, Dice: 2
+  Node: CHANCE, Depth: 1, Dice: None
+    Node: MIN, Depth: 0, Dice: 1
+    Reached Leaf - Value: -7
+    Node: MIN, Depth: 0, Dice: 2
+    Reached Leaf - Value: -7
+    Node: MIN, Depth: 0, Dice: 3
+    Reached Leaf - Value: -7
+    Node: MIN, Depth: 0, Dice: 4
+    Reached Leaf - Value: -7
+    Node: MIN, Depth: 0, Dice: 5
+    Reached Leaf - Value: -7
+  Chance Node Result: -7.0
+MAX Node Best Value: -7.0
+
+========================================
+FINAL DECISION SUMMARY:
+Total Nodes Explored (Search Space): 7
+Heuristic Value for Chosen Move: -7.0
+Action Taken: Moved Pawn ID 13
+========================================

@@ -8,6 +8,8 @@ class  Expectiminimax:
         self.max_depth = depth
         self.ai_color = ai_color
         self.opponent_color = "BLACK" if ai_color == "WHITE" else "WHITE"
+        self.nodes_count = 0 # 
+        self.log_file = "ai_search_log.txt"
 
 
     # def evaluate_heuristic(self, state):
@@ -99,16 +101,84 @@ class  Expectiminimax:
         return score
 
 
-    def expectiminimax(self, state, depth, is_chance_node, current_dice=None):
+    # def expectiminimax(self, state, depth, is_chance_node, current_dice=None):
+    #     if depth == 0 or state.board.is_game_over():
+    #         return self.evaluate_heuristic(state), None
+
+    #     if is_chance_node:
+    #         expected_value = 0
+    #         probs = stick_throw_probabilities()
+    #         for dice_val, prob in probs.items():
+    #             val, _ = self.expectiminimax(state, depth - 1, False, dice_val)
+    #             expected_value += prob * val
+    #         return expected_value, None
+
+    #     else:
+    #         board = state.board
+    #         movable_pawns = board.get_movable_pawns(current_dice)
+            
+    #         if not movable_pawns:
+    #             val, _ = self.expectiminimax(state, depth - 1, True)
+    #             return val, None
+
+    #         if state.current_player == self.ai_color:
+    #             best_val = -math.inf
+    #             best_move = None
+    #             for p_id in movable_pawns:
+    #                 # محاكاة الحركة
+    #                 new_board = deepcopy(board)
+    #                 new_board.handle_movement(p_id, current_dice)
+    #                 next_state = GameState(new_board, new_board.current_player)
+                    
+    #                 val, _ = self.expectiminimax(next_state, depth - 1, True)
+    #                 if val > best_val:
+    #                     best_val = val
+    #                     best_move = p_id
+    #             return best_val, best_move
+    #         else:
+    #             best_val = math.inf
+    #             best_move = None
+    #             for p_id in movable_pawns:
+    #                 new_board = deepcopy(board)
+    #                 new_board.handle_movement(p_id, current_dice)
+    #                 next_state = GameState(new_board, new_board.current_player)
+                    
+    #                 val, _ = self.expectiminimax(next_state, depth - 1, True)
+    #                 if val < best_val:
+    #                     best_val = val
+    #                     best_move = p_id
+    #             return best_val, best_move
+
+    def expectiminimax(self, state, depth, is_chance_node, current_dice=None, indent=""):
+        # زيادة عداد العقد عند زيارة كل عقدة جديدة
+        self.nodes_count += 1
+        
+        # تحضير معلومات العقدة لطباعتها في الملف
+        node_type = "CHANCE" if is_chance_node else ("MAX" if state.current_player == self.ai_color else "MIN")
+        log_entry = f"{indent}Node: {node_type}, Depth: {depth}, Dice: {current_dice}\n"
+        
+        # كتابة المعلومات في الملف 
+        with open(self.log_file, "a", encoding="utf-8") as f:
+            f.write(log_entry)
+
+        # حالة النهاية (حالة فوز أو وصول لأقصى عمق)
         if depth == 0 or state.board.is_game_over():
-            return self.evaluate_heuristic(state), None
+            score = self.evaluate_heuristic(state)
+            with open(self.log_file, "a", encoding="utf-8") as f:
+                f.write(f"{indent}Reached Leaf - Value: {score}\n")
+            return score, None
 
         if is_chance_node:
             expected_value = 0
+            from ThrowingSticks import stick_throw_probabilities
             probs = stick_throw_probabilities()
+            
             for dice_val, prob in probs.items():
-                val, _ = self.expectiminimax(state, depth - 1, False, dice_val)
+                val, _ = self.expectiminimax(state, depth - 1, False, dice_val, indent + "  ")
                 expected_value += prob * val
+            
+            with open(self.log_file, "a", encoding="utf-8") as f:
+                f.write(f"{indent}Chance Node Result: {expected_value}\n")
             return expected_value, None
 
         else:
@@ -116,22 +186,25 @@ class  Expectiminimax:
             movable_pawns = board.get_movable_pawns(current_dice)
             
             if not movable_pawns:
-                val, _ = self.expectiminimax(state, depth - 1, True)
+                val, _ = self.expectiminimax(state, depth - 1, True, None, indent + "  ")
                 return val, None
 
             if state.current_player == self.ai_color:
                 best_val = -math.inf
                 best_move = None
                 for p_id in movable_pawns:
-                    # محاكاة الحركة
                     new_board = deepcopy(board)
                     new_board.handle_movement(p_id, current_dice)
+                    from GameState import GameState
                     next_state = GameState(new_board, new_board.current_player)
                     
-                    val, _ = self.expectiminimax(next_state, depth - 1, True)
+                    val, _ = self.expectiminimax(next_state, depth - 1, True, None, indent + "  ")
                     if val > best_val:
                         best_val = val
                         best_move = p_id
+                
+                with open(self.log_file, "a", encoding="utf-8") as f:
+                    f.write(f"{indent}MAX Node Best Value: {best_val}\n")
                 return best_val, best_move
             else:
                 best_val = math.inf
@@ -139,10 +212,14 @@ class  Expectiminimax:
                 for p_id in movable_pawns:
                     new_board = deepcopy(board)
                     new_board.handle_movement(p_id, current_dice)
+                    from GameState import GameState
                     next_state = GameState(new_board, new_board.current_player)
                     
-                    val, _ = self.expectiminimax(next_state, depth - 1, True)
+                    val, _ = self.expectiminimax(next_state, depth - 1, True, None, indent + "  ")
                     if val < best_val:
                         best_val = val
                         best_move = p_id
+                
+                with open(self.log_file, "a", encoding="utf-8") as f:
+                    f.write(f"{indent}MIN Node Best Value: {best_val}\n")
                 return best_val, best_move
