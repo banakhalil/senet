@@ -164,6 +164,10 @@ class SenetGUI:
         self.roll_btn = tk.Button(self.controls, text="رمي العصي", command=self.roll_dice, 
                                  bg="#27ae60", fg="white", width=20, font=("Arial", 10, "bold"))
         self.roll_btn.pack(pady=5)
+        
+        # self.skip_btn = tk.Button(self.controls, text="تخطي", command=self.skip_turn,
+        #                          bg="#e74c3c", fg="white", width=20, font=("Arial", 10, "bold"))
+        # self.skip_btn.pack(pady=5)
 
     def roll_dice(self):
         """التعامل مع عملية رمي العصي"""
@@ -186,6 +190,16 @@ class SenetGUI:
                 # إذا كان دور الكمبيوتر في نمط AI، يلعب تلقائياً
                 if self.game_mode == 2 and self.board_logic.current_player == self.ai_engine.ai_color:
                     self.root.after(1000, self.ai_move)
+
+    # def skip_turn(self):
+    #     """تخطي الدور"""
+    #     if self.game_mode == 2 and self.board_logic.current_player == self.ai_engine.ai_color:
+    #         return
+    #     if self.board_logic.turn_state == "wait_move":
+    #         self.board_logic.switch_player()
+    #         self.board_logic.turn_state = "wait_dice"
+    #         self.update_board_display()
+    #         self.check_ai_turn()
 
     def on_cell_click(self, cell_id):
         """التعامل مع نقر المستخدم على الخلايا"""
@@ -314,6 +328,9 @@ class SenetGUI:
                 btn.config(text=f"{p.color[0]}\nID:{p.id}", bg=bg_color, fg=fg_color)
             
         self.info_label.config(text=f"الدور الآن: {self.board_logic.current_player}")
+        # can_skip = (self.board_logic.turn_state == "wait_move" and 
+        #            not (self.game_mode == 2 and self.board_logic.current_player == self.ai_engine.ai_color))
+        # self.skip_btn.config(state="normal" if can_skip else "disabled")
 
 if __name__ == "__main__":
     root = tk.Tk()

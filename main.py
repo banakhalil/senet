@@ -41,15 +41,15 @@ def play_human():
                 print("Try again")
 
 # تابع اللعب مع الذكاء، منعدل عليه حسب مو طالبين بملف المشروع بس هاد مبدئي
-# def play_ai():
-#     board = Board()
-#     controller = GameController(board)
+def play_ai():
+    board = Board()
+    controller = GameController(board)
 
-#     while not board.is_game_over():
-#         controller.play_turn()
+    while not board.is_game_over():
+        controller.play_turn()
 
-#     print("\nGame Over!")
-#     print("Winner:", board.get_winner())
+    print("\nGame Over!")
+    print("Winner:", board.get_winner())
 
 
 def main():
