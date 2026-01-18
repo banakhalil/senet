@@ -4,21 +4,21 @@
 Node: MAX, Depth: 2, Dice: 2
   Node: CHANCE, Depth: 1, Dice: None
     Node: MIN, Depth: 0, Dice: 1
-    Reached Leaf - Value: -1056
+    Reached Leaf - Value: -46
     Node: MIN, Depth: 0, Dice: 2
-    Reached Leaf - Value: -1056
+    Reached Leaf - Value: -46
     Node: MIN, Depth: 0, Dice: 3
-    Reached Leaf - Value: -1056
+    Reached Leaf - Value: -46
     Node: MIN, Depth: 0, Dice: 4
-    Reached Leaf - Value: -1056
+    Reached Leaf - Value: -46
     Node: MIN, Depth: 0, Dice: 5
-    Reached Leaf - Value: -1056
-  Chance Node Result: -1056.0
-MAX Node Best Value: -1056.0
+    Reached Leaf - Value: -46
+  Chance Node Result: -46.0
+MAX Node Best Value: -46.0
 
 ========================================
 FINAL DECISION SUMMARY:
 Total Nodes Explored (Search Space): 7
-Heuristic Value for Chosen Move: -1056.0
-Action Taken: Moved Pawn ID 3
+Heuristic Value for Chosen Move: -46.0
+Action Taken: Moved Pawn ID 13
 ========================================

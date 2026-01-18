@@ -4,7 +4,7 @@ from enum import Enum
 from copy import deepcopy
 from ThrowingSticks import ThrowingSticks
 
-
+# S لتسهيل عمليه الطباعة عللا شكل حرف
 SENET_PATH = [
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     [20, 19, 18, 17, 16, 15, 14, 13, 12, 11],
@@ -65,20 +65,6 @@ class Board:
     def get_pawn(self, pawn_id):
         return next((x for x in self.pawns if x.id == pawn_id), None)
 
-    def get_pawns_of_player(self, color):
-        player_pawns = []
-
-        for pawn in self.pawns:
-            # بجيب احجار اللاعب الحالي والاحجار يلي طلعت من البورد ما برجعها
-            if pawn.color == color and pawn.cell_id is not None:
-                player_pawns.append(pawn)
-
-        return player_pawns
-
-    # def show_movable_pawns(self):
-    #     movable = self.get_movable_pawns(self.current_dice)
-    #     print("You can move the following pawns:", movable)
-
     def roll_dice(self):
         if self.turn_state != wait_dice:
             print("you must move before rolling again")
@@ -98,10 +84,10 @@ class Board:
 
     def print_board(self):
         print("\n")
-        print(f"Player: {self.current_player}\n")
-        for row_ids in SENET_PATH:  # يستخدم المصفوفة الأصلية ليعرف ترتيب الأرقام
+        # print(f"Player: {self.current_player}\n")
+        for row_ids in SENET_PATH:  # S يستخدم هذا المسار لترتيب الطباعة بشكل
             for cell_id in row_ids:
-                # يجلب بيانات الخلية من القاموس الخطي
+                # (dictionary) يجلب بيانات الخلية من مصفوفة الخلايا
                 cell = self.cells[cell_id]
                 if cell.occupied_by:
                     print(
@@ -119,7 +105,7 @@ class Board:
             return 'invalid'
 
         current_cell_id = pawn.cell_id
-
+        # نوع الحركة حسب الخلية الحالية
         if current_cell_id == 30:
             return 'exit'
 
@@ -135,6 +121,7 @@ class Board:
             else:
                 return 'to_15'
 
+        # نوع الحركة بالاعتماد على الخلية الهدف
         target_cell_id = current_cell_id + dice_result
 
         if current_cell_id == 26:
@@ -174,8 +161,10 @@ class Board:
             print("This pawn cannot be moved with the current dice result")
             return False
 
+        # التحقق من وجود احجار على الخلايا الخاصة، ولم يقم اللاعب بتحريكها
         moved_pawns_to_15 = self.special_to15(pawn_id)
 
+        # نوع الحركة
         move_type = self.get_move_type(pawn_id, dice_result)
 
         if move_type == 'invalid':
@@ -194,6 +183,7 @@ class Board:
         elif move_type == 'exit':
             self.exit(pawn_id)
 
+        # في نهاية كل دور، التحقق من وجود احجار يجب ان تعاد الى بيت البعث
         if moved_pawns_to_15:
             for pawn_id_to_15 in moved_pawns_to_15:
                 self.move_to_15(pawn_id_to_15)
@@ -204,7 +194,7 @@ class Board:
         return True
 
     def move(self, pawn_id, dice_result):
-        "تحريك الحجر لخلية فاضية"
+        # تحريك الحجر لخلية فاضية
         pawn = self.get_pawn(pawn_id)
 
         current_cell_id = pawn.cell_id
@@ -216,13 +206,6 @@ class Board:
         target_cell.set_pawn(pawn)
 
         pawn.cell_id = target_cell_id
-
-        # if pawn.cell_id in [28, 29, 30]:
-        #     pawn.on_special = True
-        # else:
-        #     pawn.on_special = False
-
-        # self.print_board()
 
     def swap(self, pawn_id, dice_result):
         pawn1 = self.get_pawn(pawn_id)
@@ -241,18 +224,6 @@ class Board:
         target_cell.set_pawn(pawn1)
         pawn1.cell_id = target_cell_id
 
-        # if pawn1.cell_id in [28, 29, 30]:
-        #     pawn1.on_special = True
-        # else:
-        #     pawn1.on_special = False
-
-        # if pawn2.cell_id in [28, 29, 30]:
-        #     pawn2.on_special = True
-        # else:
-        #     pawn2.on_special = False
-
-        # self.print_board()
-
     def move_to_15(self, pawn_id):
         pawn = self.get_pawn(pawn_id)
         current_cell = self.get_cell(pawn.cell_id)
@@ -263,8 +234,6 @@ class Board:
             if cell.is_empty():
                 cell.set_pawn(pawn)
                 pawn.cell_id = cell.id
-                # pawn.on_special = False
-                # self.print_board()
                 return
 
     def special_to15(self, pawn_id):
@@ -274,7 +243,7 @@ class Board:
             cell = self.get_cell(cell_id)
             pawn = cell.occupied_by
             if pawn and pawn.color == self.current_player:
-                # اذا الحجر يلي رح يختارو اللاعب غير يلي موجود ع الخلايا الخاصة ، رح نرجع الحجر لل 15
+                # اذا الحجر يلي رح يختارو اللاعب مو نفسو يلي موجود ع الخلايا الخاصة ، رح نرجع الحجر لل 15
                 if pawn.id != pawn_id:
                     moved_pawn_ids.append(pawn.id)
 
@@ -290,7 +259,15 @@ class Board:
         else:
             self.exited_pawns["BLACK"] += 1
 
-        # self.print_board()
+    def get_pawns_of_player(self, color):
+        player_pawns = []
+
+        for pawn in self.pawns:
+            # بجيب احجار اللاعب الحالي والاحجار يلي طلعت من البورد ما برجعها
+            if pawn.color == color and pawn.cell_id is not None:
+                player_pawns.append(pawn)
+
+        return player_pawns
 
     def get_movable_pawns(self, dice_result):
         movable_pawns = []
@@ -317,100 +294,3 @@ class Board:
         if self.exited_pawns["BLACK"] == 7:
             return "BLACK"
         return None
-
-
-# if __name__ == "__main__":
-#     board = Board()
-
-#     while True:
-#         if board.is_game_over():
-#             print("Game Over!")
-#             print("Winner:", board.get_winner())
-#             break
-
-#         # print(f"Current player: {board.current_player}")
-
-#         if board.turn_state == wait_dice:
-#             print("\n" + "-" * 10)
-#             board.print_board()
-#             input("press Enter to throw sticks ")
-#             steps = board.roll_dice()
-#             movable = board.get_movable_pawns(steps)
-
-#             if not movable:
-#                 print("No possible moves. Turn skipped.")
-#                 board.switch_player()
-#                 board.turn_state = wait_dice
-#                 continue
-
-#             print("you can moves these pawns:", movable)
-
-#         elif board.turn_state == wait_move:
-#             try:
-#                 pawn_id = int(input("choose pawn id to move: "))
-#             except ValueError:
-#                 print("please enter a valid number")
-#                 continue
-
-#             success = board.handle_movement(pawn_id, board.current_dice)
-
-#             if success:
-#                 board.turn_state = wait_dice
-#             else:
-#                 print("Try again")
-
-    # MOVE
-    # board.handle_movement(14, 2)
-    # board.handle_movement(13, 1)
-
-    # SWAP
-    # board.handle_movement(1, 5)
-    # board.handle_movement(2, 3)
-    # board.handle_movement(1, 2)
-    # board.handle_movement(1, 5)
-
-    # to 15
-    # board.handle_movement(14, 5)
-    # board.handle_movement(13, 1)
-    # board.handle_movement(14, 5)
-    # board.handle_movement(13, 1)
-    # board.handle_movement(14, 3)
-    # board.handle_movement(13, 1)
-    # board.handle_movement(14, 2)
-    # board.handle_movement(13, 1)
-    # board.handle_movement(14, 1)
-    # board.handle_movement(13, 1)
-
-    # special to 15
-    # board.handle_movement(14, 1)
-    # board.handle_movement(13, 5)
-    # board.handle_movement(14, 1)
-    # board.handle_movement(13, 5)
-    # board.handle_movement(14, 1)
-    # board.handle_movement(13, 3)
-    # board.handle_movement(14, 1)
-
-    # board.handle_movement(13, 4)
-    # board.handle_movement(14, 1)
-    # board.handle_movement(11, 2)
-    # board.handle_movement(14, 1)
-
-    # board.handle_movement(11, 1)
-    # board.handle_movement(14, 4)
-    # board.handle_movement(11, 1)
-    # board.handle_movement(14, 2)
-    # board.handle_movement(11, 1)
-    # board.handle_movement(14, 2)
-    # board.handle_movement(11, 1)
-    # board.handle_movement(12, 1)
-
-    # board.handle_movement(13, 1)
-    # print(board.get_cell(28).occupied_by)
-    # board.print_board()
-    # board.handle_movement(14, 2)
-
-    # board.handle_movement(13, 5)
-    # board.handle_movement(13, 5)
-    # board.handle_movement(13, 2)
-    # board.handle_movement(13, 4)
-    # board.handle_movement(13, 1)

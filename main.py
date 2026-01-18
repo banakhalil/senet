@@ -1,6 +1,8 @@
 from Board import Board, wait_dice, wait_move
 from Game_Controller import GameController
 
+# التناوب باللعب بين شخصين بالتيرمنال
+
 
 def play_human():
     board = Board()
@@ -13,6 +15,7 @@ def play_human():
 
         if board.turn_state == wait_dice:
             print("\n" + "-" * 10)
+            print(f"Player: {board.current_player}")
             board.print_board()
             input("press Enter to throw sticks ")
             steps = board.roll_dice()
@@ -24,7 +27,7 @@ def play_human():
                 board.turn_state = wait_dice
                 continue
 
-            print("you can moves these pawns:", movable)
+            print("you can move these pawns:", movable)
 
         elif board.turn_state == wait_move:
             try:
@@ -34,20 +37,28 @@ def play_human():
                 continue
 
             success = board.handle_movement(pawn_id, board.current_dice)
+            print(
+                f"WHITE: {board.exited_pawns["WHITE"]}   BLACK: {board.exited_pawns["BLACK"]}")
 
             if success:
                 board.turn_state = wait_dice
             else:
                 print("Try again")
 
-# تابع اللعب مع الذكاء، منعدل عليه حسب مو طالبين بملف المشروع بس هاد مبدئي
+# تناوب باللعب بين شخص وكومبيوتر بالتيرمنال
+
+
 def play_ai():
     board = Board()
     controller = GameController(board)
 
+    print("\n" + "-" * 10)
+    print(f"Player: {board.current_player}")
+    board.print_board()
     while not board.is_game_over():
         controller.play_turn()
 
+    print()
     print("\nGame Over!")
     print("Winner:", board.get_winner())
 
